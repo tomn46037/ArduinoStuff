@@ -1,6 +1,7 @@
 //Copied from SainSmart
 #include <Wire.h> 
 #include <LiquidCrystal_I2C.h>
+#include <L3G4200D.h>
 
 LiquidCrystal_I2C lcd7(0x27,16,2);  // set the LCD address to 0x27 for a 16 chars and 2 line display
 LiquidCrystal_I2C lcd6(0x26,16,2);  // set the LCD address to 0x27 for a 16 chars and 2 line display
@@ -15,6 +16,8 @@ LiquidCrystal_I2C lcd0(0x20,16,2);  // set the LCD address to 0x27 for a 16 char
 int c = 1;
 
 
+// Gyro 
+L3G4200D gyro;
 
 
 
@@ -142,35 +145,49 @@ void setup()
   bmp085Calibration();
 
   lcd7.setCursor(0,1);
+  lcd7.print("Init Gyro..     ");
+
+  gyro.enableDefault();
+
+  lcd7.setCursor(0,1);
   lcd7.print("Done with Init..");
 
 }
 
 void loop()
 {
-  delay(1000);
-  
-  temperature = bmp085GetTemperature(bmp085ReadUT());
-  pressure = bmp085GetPressure(bmp085ReadUP());
+  delay(100);
+
+  gyro.read();
 
   lcd7.clear();
   lcd7.setCursor(0,0);
-  lcd7.print("This is a test!");
-  
-  lcd7.setCursor(10,1);
-  lcd7.print(c++, DEC);
 
-  lcd1.clear();
-  lcd1.setCursor(0,0);
-  lcd1.print("Temp: ");
-  lcd1.print(temperature*.1, DEC);
-  lcd1.print(" deg C");
+  lcd7.setCursor(0,1);
+  lcd7.print((int)gyro.g.x);
+
+  lcd7.setCursor(5,1);
+  lcd7.print((int)gyro.g.y);
+
+  lcd7.setCursor(10,1);
+  lcd7.print((int)gyro.g.z);
+
+
+  if ( c%100 ) {  
+    temperature = bmp085GetTemperature(bmp085ReadUT());
+    pressure = bmp085GetPressure(bmp085ReadUP());
+
+    lcd1.clear();
+    lcd1.setCursor(0,0);
+    lcd1.print("Temp: ");
+    lcd1.print(temperature*.1, DEC);
+    lcd1.print(" deg C");
   
-  lcd1.setCursor(0,1);
-  lcd1.print("Baro: ");
-  lcd1.print(pressure*0.0002952998016471232, DEC);
-  lcd1.print(" Inches");
-  
+    lcd1.setCursor(0,1);
+    lcd1.print("Baro: ");
+    lcd1.print(pressure*0.0002952998016471232, DEC);
+    lcd1.print(" Inches");
+  }
 }
 
 
