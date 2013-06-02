@@ -64,8 +64,6 @@ void loop()
   lcd.print(RTC.get(DS1307_DATE,false));//read date
   lcd.print("/");
   lcd.print(RTC.get(DS1307_YR,false)); //read year
-  lcd.println();
-
 
 }
 
