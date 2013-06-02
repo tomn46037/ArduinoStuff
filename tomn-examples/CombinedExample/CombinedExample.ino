@@ -192,7 +192,7 @@ void setup()
 
 void loop()
 {
-  delay(100);
+  delay(50);
 
   // Gyro
   gyro.read();
@@ -200,6 +200,7 @@ void loop()
   lcd0.clear();
   lcd7.clear();
   lcd7.setCursor(0,0);
+  lcd0.print((int)c);
 
   lcd7.setCursor(0,1);
   lcd7.print((int)gyro.g.x);
@@ -295,8 +296,8 @@ void loop()
   lcd0.print(z);
 
 
-
-  if ( c%100 ) {  
+  c++;
+  if ( !(c%10) ) {  
     temperature = bmp085GetTemperature(bmp085ReadUT());
     pressure = bmp085GetPressure(bmp085ReadUP());
 
