@@ -16,7 +16,7 @@ extern "C" {
 #define txPin 7
 
 //SoftwareSerial mySerial =  SoftwareSerial(rxPin, txPin);
-SoftwareSerial mySerial(2, 3);  //rx, tx
+SoftwareSerial mySerial(7, 8);  //rx, tx
 
 
 
@@ -102,7 +102,7 @@ GSM::GSM(void)
 {
   // set some GSM pins as inputs, some as outputs
   pinMode(GSM_ON, OUTPUT);               // sets pin 5 as output
-  pinMode(GSM_RESET, OUTPUT);            // sets pin 4 as output
+  //pinMode(GSM_RESET, OUTPUT);            // sets pin 4 as output
 
   //pinMode(DTMF_OUTPUT_ENABLE, OUTPUT);   // sets pin 2 as output
   // deactivation of IC8 so DTMF is disabled by default
