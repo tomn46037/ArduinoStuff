@@ -1,0 +1,100 @@
+byte sameStatus;
+byte machState;
+byte statusByte;
+static byte msgLength = 1;
+byte confBit0;
+byte confBit1;
+static int readB = 0;
+String finalMsg="";
+String finalConf="";
+String sameMsg="ZCZC";    //4707 does not include this in SAME Buffer
+String sameConf="3333";   //places 3's for confidence of ZCZC Header
+
+
+
+void wb_SAME_Status()
+{
+  while(readB < msgLength)
+  {
+    Wire.beginTransmission(B0010001);
+    Wire.write(byte(0x54)); //command for wb same message check
+    Wire.write(byte(0x00)); //argument for buffer and interrupt clear/acknowledge
+    Wire.write(byte(readB)); //
+    Wire.endTransmission();
+    delay(3);
+    Wire.requestFrom(B0010001, 14);
+    delay(3);
+    statusByte = Wire.read();
+    sameStatus = Wire.read();
+    machState = Wire.read();
+    msgLength = Wire.read();
+    confBit1 = Wire.read();
+    confBit0 = Wire.read();
+    sameConf += confBit0 & B11;
+    sameConf += (confBit0 >> 2) & B11;
+    sameConf += (confBit0 >> 4) & B11;
+    sameConf += (confBit0 >> 6) & B11;
+    sameConf += confBit1 & B11;
+    sameConf += (confBit1 >> 2) & B11;
+    sameConf += (confBit1 >> 4) & B11;
+    sameConf += (confBit1 >> 6) & B11;
+    for (int i = readB; i <=readB + 7; i++)
+    {
+      char d = Wire.read();
+      sameMsg += d;
+      delay(2);
+    }
+    readB = readB + 8;
+  }
+  readB = 0;
+  Serial.println(" ");
+  //Serial.println(sameMsg);
+  if (readB > msgLength)
+  {
+    finalMsg = sameMsg;
+    finalConf = sameConf;
+    sameMsg ="ZCZC";
+    sameConf ="3333"; 
+  }
+  
+  Serial.print("Message Length: ");
+  Serial.println(msgLength, DEC);
+  Serial.println("Last SAME Message Received:");
+  Serial.println(finalMsg);
+  Serial.println(finalConf);
+  Serial.println(" ");
+  
+}
+
+void clr_Same()
+{
+  Wire.beginTransmission(B0010001);
+  Wire.write(byte(0x54)); //command for wb same message check
+  Wire.write(byte(0x03)); //argument for buffer and interrupt clear/acknowledge
+  Wire.write(byte(0x00)); //
+  Wire.endTransmission();
+  delay(3);
+  Wire.requestFrom(B0010001, 14);
+  delay(3);
+  chkStatus();
+  sameStatus = Wire.read();
+  //Serial.print("Same Status: ");
+  //Serial.println(sameStatus, BIN);
+  //Serial.print("Machine State: ");
+  machState = Wire.read();
+  //Serial.println(machState, DEC); 
+  msgLength = Wire.read();
+  confBit1 = Wire.read();
+  confBit0 = Wire.read();
+  readB = 0;
+  for (int i = readB; i <=readB + 7; i++)
+  {
+    char d = Wire.read();
+    delay(1);
+  }
+  readB = 0;
+  msgLength = 1;
+  confBit1=0;
+  confBit0=0;
+}
+
